@@ -1,31 +1,24 @@
-// SERVER-SIDE JAVASCRIPT
+const express = require('express');
+const path = require('path');
+const bodyParser = require('body-parser');
+const controllers = require('./controllers');
 
-//require express in our app
-let express = require('express');
-// generate a new express app and call it 'app'
-let app = express();
-let bodyParser = require('body-parser');
-
-// serve static files from public folder
-app.use(express.static(__dirname + '/public'));
+const app = express();
+// Serve static files from public folder
+app.use(express.static(path.resolve('public')));
 app.use(bodyParser.urlencoded({
-  extended: true
+  extended: true,
 }));
 
-// import controllers
-let controllers = require('./controllers');
 
-// routes
-
-app.get('/', function(req, res) {
-
+// Routes
+app.get('/', (req, res) => {
   res.sendFile('views/index.html', {
-    root: __dirname
+    root: __dirname,
   });
-  console.log(__dirname);
 });
 
-// documentation route
+// Documentation route
 app.get('/api', controllers.api.index);
 
 // Pool routes
@@ -34,16 +27,11 @@ app.get('/api/pools/:id', controllers.pools.show);
 app.post('/api/pools', controllers.pools.create);
 app.delete('/api/pools/:id', controllers.pools.destroy);
 
-// Events routes
+// Event routes
 app.post('/api/pools/:poolId/events', controllers.events.create);
 app.delete('/api/pools/:poolId/events/:eventId', controllers.events.destroy);
 
-
-
-/**********
- * SERVER *
- **********/
-
-app.listen(process.env.PORT || 3000, function() {
-  console.log("Express Server is up and running on http://localhost:3000/");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Express Server is up and running on port ${PORT}`);
 });
