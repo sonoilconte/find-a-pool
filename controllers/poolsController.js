@@ -1,110 +1,94 @@
-// require db to use models
-let db = require('../models');
-var GoogleMapsAPI = require('googlemaps');
+const GoogleMapsAPI = require('googlemaps');
+const db = require('../models');
 
-// importing google maps:
-var publicConfig = {
-  key: 'AIzaSyBHLett8djBo62dDXj0EjCimF8Rd6E8cxg',
-  stagger_time:       1000, // for elevationPath
-  encode_polylines:   false,
-  secure:             true, // use https
-  //proxy:              'http://127.0.0.1:9999' // optional, set a proxy for HTTP requests
+// Google maps config
+const publicConfig = {
+  key: 'AIzaSyBHLett8djBo62dDXj0EjCimF8Rd6E8cxg', // TODO: Move this to .env
+  stagger_time: 1000, // for elevationPath
+  encode_polylines: false,
+  secure: true, // use https
 };
-var gmAPI = new GoogleMapsAPI(publicConfig);
+const gmAPI = new GoogleMapsAPI(publicConfig);
 
-// setup functions for end-points
+function renderMapLatLng(pools) {
+  pools.forEach((pool) => {
+    // Geoencode the address of the pool, and save lat and long in the DB
+    // TODO: This appears to be calling maps every time we get a pool in the
+    // index ... if so must change
+    const geocodeParams = {
+      address: pool.address,
+    };
+    const updatedPool = pool;
+    gmAPI.geocode(geocodeParams, (err, encoding) => {
+      updatedPool.maps.lat = encoding.results[0].geometry.location.lat;
+      updatedPool.maps.long = encoding.results[0].geometry.location.lng;
+      console.log('Geoencoding... lat, long ', updatedPool.maps);
+      updatedPool.save();
+    });
+  });
+}
+
+// TODO: we should only geoencode once i.e. when we create the new pool
+function createNewPool(pool) {
+  const geocodeParams = {
+    address: pool.address,
+  };
+  const updatedPool = pool;
+  gmAPI.geocode(geocodeParams, (err, encoding) => {
+    updatedPool.maps.lat = encoding.results[0].geometry.location.lat;
+    updatedPool.maps.long = encoding.results[0].geometry.location.lng;
+    console.log('Pool was created and lat, long found is ', updatedPool.maps);
+    updatedPool.save();
+  });
+}
+
+// Responds with index of all pools
 function index(req, res) {
-  // this will return all POOLS
-  console.log('This route shows all Pools.');
-
-  // Find all objects in the database that are in the Pool Schema.
-  db.Pool.find({}, function(err, pools) {
+  db.Pool.find({}, (err, pools) => {
     if (err) {
-      console.log("Error", err);
+      console.log('Error finding all pools', err);
     }
+    // TODO: This likely needs to be fixed such that we're somehow including the
+    // render in the response
     renderMapLatLng(pools);
     res.json(pools);
   });
 }
 
 function show(req, res) {
-  // this will return a pool by ID.
-  console.log('This route shows one pool by ID');
-
-  // take id from url parameter & find Pool object to pass to callback
-  db.Pool.findById(req.params.id, function(err, pool) {
+  // Respond with a pool by ID
+  db.Pool.findById(req.params.id, (err, pool) => {
     if (err) {
-      console.log("Error finding ID", err);
+      console.log('Error finding pool by ID', err);
     }
-    renderMapLatLng(pool);
+    // renderMapLatLng(pool); // this is breaking below
     res.json(pool);
   });
-
 }
 
 function create(req, res) {
-  //this will create a new pool
-  // retrieve data from parameters passed from client-browser
-  db.Pool.create(req.body, function (err, pool) {
-    if (err){
+  db.Pool.create(req.body, (err, pool) => {
+    if (err) {
       console.log('unable to create new pool error', err);
     }
-    createNewPool(pool);
+    createNewPool(pool); // We need to handle the async nature of this so we
+    // respond after pool fully created
     res.json(pool);
-  })
+  });
 }
 
 function destroy(req, res) {
-  // Log what is happening with this route
-  console.log('This route deletes one pool by ID', req.params.id);
-
-  // find db record by id from paramter passed in url string & remove it from the DB
-  db.Pool.findOneAndRemove({_id: req.params.id}, function (err, pool) {
-    //log error messaging
+  db.Pool.findOneAndRemove({ _id: req.params.id }, (err, pool) => {
     if (err) {
-      console.log('Unable to find ID error', err);
+      console.log('Error finding and deleting pool', err);
     }
-
-    // respond with the the object that was removed
-    res.json(pool);
+    res.json(pool); // TODO: don't respond with entire document?
   });
 }
 
-// Non Route Functions:
-// renderMapLatLng checks to see if the
-function renderMapLatLng (pools) {
-  pools.forEach(function (pool) {
-      // geocode API
-      var geocodeParams = {
-        "address": pool.address,
-      };
-      gmAPI.geocode(geocodeParams, function(err, result){
-        console.log("the result is ", result);
-        pool.maps.lat = result.results[0].geometry.location.lat;
-        pool.maps.long = result.results[0].geometry.location.lng;
-        pool.save();
-        console.log('the pool LatLng is ', pool.maps);
-      });
-  });
-}
-
-function createNewPool (pool){
-  // geocode API
-  var geocodeParams = {
-    "address": pool.address,
-  };
-  gmAPI.geocode(geocodeParams, function(err, result){
-    console.log("the result is ", result);
-    pool.maps.lat = result.results[0].geometry.location.lat;
-    pool.maps.long = result.results[0].geometry.location.lng;
-    pool.save();
-    console.log('the pool LatLng is ', pool.maps);
-  });
-}
-// controllers/poolsController.js
 module.exports = {
-  index: index,
-  show: show,
-  create: create,
-  destroy: destroy
+  index,
+  show,
+  create,
+  destroy,
 };

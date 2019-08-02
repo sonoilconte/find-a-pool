@@ -10,7 +10,6 @@ app.use(bodyParser.urlencoded({
   extended: true,
 }));
 
-
 // Routes
 app.get('/', (req, res) => {
   res.sendFile('views/index.html', {

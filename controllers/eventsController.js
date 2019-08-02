@@ -1,6 +1,4 @@
-// albumsSongsController
 var db = require('../models');
-
 
 // POST '/api/pools/:poolId/events'
 function create(req, res) {
