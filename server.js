@@ -1,9 +1,11 @@
+const dotenv = require('dotenv');
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const controllers = require('./controllers');
 
 const app = express();
+dotenv.config();
 // Serve static files from public folder
 app.use(express.static(path.resolve('public')));
 app.use(bodyParser.urlencoded({

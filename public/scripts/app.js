@@ -44,7 +44,7 @@ function indexPools() {
   });
 }
 
-function handleIndexSuccess(poolsData){
+function handleIndexSuccess(poolsData) {
   // Render pool data to page
   poolsData.forEach(function(pool) {
     renderPool(pool);
@@ -78,7 +78,7 @@ function handleIndexSuccess(poolsData){
   showCurrentDay();
 }
 
-function listenDeletePool(){
+function listenDeletePool() {
   $('.pool-delete-btn').on('click', function(e){
     e.preventDefault();
     let id = $(this).closest('.pool').data('pool-id');
@@ -91,7 +91,7 @@ function listenDeletePool(){
   });
 }
 
-function listenAddEvent(){
+function listenAddEvent() {
   $('.add-event form').on('submit', function(e){
     e.preventDefault();
     let data = $(this).serialize();
@@ -108,7 +108,7 @@ function listenAddEvent(){
 }
 
 // Event listener for deleting an event
-function listenDeleteEvent(){
+function listenDeleteEvent() {
   $('.delete-event').on('click', function(e){
     e.preventDefault();
     let eventId = $(this).parent().parent().attr('id');
@@ -137,7 +137,7 @@ function handleNewPoolSuccess(newPool) {
   // removeEventListeners();
 }
 
-function handlePoolDeleteSuccess(deletedPool){
+function handlePoolDeleteSuccess(deletedPool) {
   let poolDiv = `[data-pool-id=${deletedPool._id}]`;
   $(poolDiv).hide('slow', function(){
     $(poolDiv).remove;
@@ -145,7 +145,7 @@ function handlePoolDeleteSuccess(deletedPool){
   removeEventListeners();
 }
 
-function handleNewEventSuccess(pool){
+function handleNewEventSuccess(pool) {
   // create the target for where we're going to place the new event
   let poolDiv = `[data-pool-id=${pool._id}]`;
   // set event to add to be the last event listed in the pool response
@@ -154,18 +154,18 @@ function handleNewEventSuccess(pool){
   removeEventListeners();
 }
 
-function handleEventDeleteSuccess(eventDeleted){
-    $(`#${eventDeleted._id}`).hide('slow', function(){
+function handleEventDeleteSuccess(eventDeleted) {
+    $(`#${eventDeleted._id}`).hide('slow', function() {
       $(`#${eventDeleted._id}`).remove();
     });
   removeEventListeners();
 }
 
-function handleError(err){
+function handleError(err) {
   console.log(err);
 }
 
-function listenDayClick(){
+function listenDayClick() {
   // toggle events for a day of the week clicked
   $('.day-of-week').on('click', function(e){
     e.preventDefault();
@@ -176,21 +176,21 @@ function listenDayClick(){
   });
 }
 
-function toggleAdmin(){
+function toggleAdmin() {
   $('.pool-header button').toggle();
   $('.delete-event').toggle();
   $('#add-pool').toggle();
   $('.add-event').toggle();
 }
 
-function hideAdmin(){
+function hideAdmin() {
   $('.pool-header button').hide();
   $('.delete-event').hide();
   $('#add-pool').hide();
   $('.add-event').hide();
 }
 
-function showCurrentDay(){
+function showCurrentDay() {
   $('.event-holder').hide();
   $('.monday .event-holder').show();
   $('.monday').find('.glyphicon-plus').toggle();
@@ -198,7 +198,7 @@ function showCurrentDay(){
 }
 
 // remove event listeners such that adding event listeners accross whole page on ajax complete does not duplicate event listeners
-function removeEventListeners(){
+function removeEventListeners() {
   $('.pool-delete-btn').off();
   $('.add-event form').off();
   $('.delete-event').off();

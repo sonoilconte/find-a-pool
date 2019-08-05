@@ -1,16 +1,8 @@
 const GoogleMapsAPI = require('googlemaps');
 const db = require('../models');
 
-// Google maps config
-const publicConfig = {
-  key: 'AIzaSyBHLett8djBo62dDXj0EjCimF8Rd6E8cxg', // TODO: Move this to .env
-  stagger_time: 1000, // for elevationPath
-  encode_polylines: false,
-  secure: true, // use https
-};
-const gmAPI = new GoogleMapsAPI(publicConfig);
-
 function renderMapLatLng(pools) {
+
   pools.forEach((pool) => {
     // Geoencode the address of the pool, and save lat and long in the DB
     // TODO: This appears to be calling maps every time we get a pool in the
@@ -30,6 +22,14 @@ function renderMapLatLng(pools) {
 
 // TODO: we should only geoencode once i.e. when we create the new pool
 function createNewPool(pool) {
+  // Google maps config
+  const publicConfig = {
+    key: process.env.MAPS_API_KEY,
+    stagger_time: 1000, // for elevationPath
+    encode_polylines: false,
+    secure: true, // use https
+  };
+  const gmAPI = new GoogleMapsAPI(publicConfig);
   const geocodeParams = {
     address: pool.address,
   };
@@ -56,9 +56,7 @@ function index(req, res) {
     if (err) {
       console.log('Error finding all pools', err);
     }
-    // TODO: This likely needs to be fixed such that we're somehow including the
-    // render in the response
-    renderMapLatLng(pools);
+    console.log({ pools });
     res.json(pools);
   });
 }
@@ -69,7 +67,6 @@ function show(req, res) {
     if (err) {
       console.log('Error finding pool by ID', err);
     }
-    // renderMapLatLng(pool); // this is breaking below
     res.json(pool);
   });
 }
