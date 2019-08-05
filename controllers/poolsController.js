@@ -34,12 +34,20 @@ function createNewPool(pool) {
     address: pool.address,
   };
   const updatedPool = pool;
-  gmAPI.geocode(geocodeParams, (err, encoding) => {
-    updatedPool.maps.lat = encoding.results[0].geometry.location.lat;
-    updatedPool.maps.long = encoding.results[0].geometry.location.lng;
-    console.log('Pool was created and lat, long found is ', updatedPool.maps);
-    updatedPool.save();
-  });
+  return new Promise((resolve, reject) => {
+    gmAPI.geocode(geocodeParams, (err, res) => {
+      updatedPool.maps.lat = res.results[0].geometry.location.lat;
+      updatedPool.maps.long = res.results[0].geometry.location.lng;
+      console.log('Pool was created and lat, long found from g maps is ', updatedPool.maps);
+      updatedPool.save()
+      .then(pool => {
+        resolve(pool);
+      })
+      .catch(err => {
+        reject(err);
+      });
+    });
+  })
 }
 
 // Responds with index of all pools
@@ -67,13 +75,19 @@ function show(req, res) {
 }
 
 function create(req, res) {
-  db.Pool.create(req.body, (err, pool) => {
-    if (err) {
-      console.log('unable to create new pool error', err);
-    }
-    createNewPool(pool); // We need to handle the async nature of this so we
-    // respond after pool fully created
-    res.json(pool);
+
+  console.log('req.body', req.body);
+  db.Pool.create(req.body)
+  .then((pool) => {
+    console.log('created pool', pool);
+    return createNewPool(pool);
+  })
+  .then(result => {
+    console.log('created pool with result', result);
+    res.json(result);
+  })
+  .catch(err => {
+    console.log('caught error ', err);
   });
 }
 

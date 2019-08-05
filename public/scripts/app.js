@@ -1,17 +1,8 @@
-console.log(`sanity check app.js connected`);
+$(document).ready(function() {
 
-$(document).ready(function(){
-
-  // Get index of all pools in the database
-  $.ajax({
-    method: 'GET',
-    url: 'api/pools/',
-    success: handleIndexSuccess,
-    error: handleError
-  });
-
+  indexPools();
   // Add pool event listener and ajax call
-  $('#add-pool form').on('submit', function(e){
+  $('#add-pool form').on('submit', function(e) {
     e.preventDefault();
     let data = $(this).serialize();
     $.ajax({
@@ -25,11 +16,13 @@ $(document).ready(function(){
   });
 
   // Admin Log In to toggle admin controls in and out of view
-  $('#admin').on('click', function(){
+  $('#admin').on('click', function() {
     toggleAdmin();
   });
 
 });
+
+
 
 // Any time there's an ajax call, re-attach all the event listeners
 //  Event listeners are removed at the end of each handleSuccess function
@@ -41,9 +34,19 @@ $(document).ajaxComplete(listenAddEvent);
 $(document).ajaxComplete(listenDeleteEvent);
 $(document).ajaxComplete(listenDayClick);
 
+function indexPools() {
+  // Get index of all pools in the database
+  $.ajax({
+    method: 'GET',
+    url: 'api/pools/',
+    success: handleIndexSuccess,
+    error: handleError
+  });
+}
+
 function handleIndexSuccess(poolsData){
   // Render pool data to page
-  poolsData.forEach(function(pool){
+  poolsData.forEach(function(pool) {
     renderPool(pool);
     let poolDiv = `[data-pool-id=${pool._id}]`;
     // For each pool, render the events for that pool
@@ -119,15 +122,19 @@ function listenDeleteEvent(){
   })
 }
 
-function handleNewPoolSuccess(newPool){
-  renderPool(newPool);
-  // get the div for the pool where we'll put events
-  let poolDiv = `[data-pool-id=${newPool._id}]`;
-  newPool.events.forEach(function(element){
-    renderEvent(poolDiv, element);
-  });
-  // remove event listeners such that adding event listeners accross page on ajax complete does not duplicate event listeners
-  removeEventListeners();
+function handleNewPoolSuccess(newPool) {
+  // TODO: Below I put in a quick fix where I simply reindex all the pools such that you see the new one with the maps ready
+  // What I should do is a separate render of the new pool
+  // where I injext that new pool's html into the dom without re-rendering everything
+  indexPools();
+  // renderPool(newPool);
+  // // get the div for the pool where we'll put events
+  // let poolDiv = `[data-pool-id=${newPool._id}]`;
+  // newPool.events.forEach(function(element){
+  //   renderEvent(poolDiv, element);
+  // });
+  // // remove event listeners such that adding event listeners accross page on ajax complete does not duplicate event listeners
+  // removeEventListeners();
 }
 
 function handlePoolDeleteSuccess(deletedPool){
