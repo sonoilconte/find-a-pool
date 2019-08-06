@@ -1,37 +1,48 @@
-var db = require('../models');
+const db = require('../models');
 
-// POST '/api/pools/:poolId/events'
 function create(req, res) {
-  db.Pool.findById(req.params.poolId, function(err, foundPool) {
-    console.log(req.body);
-    var newEvent = new db.Events(req.body);  // how would we validate this data?
+  // TODO: validation and error handling, refactor in promise chain
+  db.Pool.findById(req.params.poolId, (err, foundPool) => {
+    console.log('Creating event from ', req.body);
+    const newEvent = new db.Event(req.body);
     foundPool.events.push(newEvent);
-    foundPool.save(function(err, savedPool) {
-      console.log('newEvent created: ', newEvent);
-      res.json(savedPool);  // responding with updated object
+    foundPool.save((saveErr, savedPool) => {
+      if (saveErr) {
+        console.log('Error saving pool with new event', saveErr);
+        res.status(500).end();
+        return;
+      }
+      console.log('Created ', { newEvent });
+      res.json(savedPool);
     });
   });
 }
 
-// DELETE '/api/pools/:poolId/events/:eventId'
 function destroy(req, res) {
-    db.Pool.findById(req.params.poolId, function (err, foundPool) {
-     if (err) {console.log('error finding Pool', err);}
-     // we've got the Pool, now find the event within it
-     let correctEvent = foundPool.events.id(req.params.eventId);
-     if (correctEvent) {
-       correctEvent.remove();
-       // resave the Pool now that the event is gone
-       foundPool.save(function(err, saved) {
-         console.log('REMOVED ', correctEvent.title, 'FROM ', saved.events);
-         res.json(correctEvent);
-       });
-
-     }
-});
+  // TODO: validation and error handling
+  const { poolId, eventId } = req.params;
+  console.log({ poolId, eventId });
+  db.Pool.findById(poolId, (err, foundPool) => {
+    if (err) {
+      console.log('Error finding Pool', err);
+    }
+    const event = foundPool.events.id(eventId);
+    if (event) {
+      event.remove();
+      foundPool.save((saveErr, pool) => {
+        if (saveErr) {
+          console.log('Error saving pool with removed event', saveErr);
+          res.status(500).end();
+          return;
+        }
+        console.log(`Removed ${event} from ${pool.name}`);
+        res.json(event);
+      });
+    }
+  });
 }
 
 module.exports = {
-  create: create,
-  destroy: destroy
+  create,
+  destroy,
 };

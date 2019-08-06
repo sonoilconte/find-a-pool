@@ -1,10 +1,7 @@
-// incorporate mongoose for model & setup Schema
-let mongoose = require('mongoose'),
-  Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Event = require('./event');
 
-let Events = require('./events')
-
-let PoolSchema = new Schema({
+const PoolSchema = new mongoose.Schema({
   name: String,
   address: String,
   phoneNumber: String,
@@ -20,13 +17,11 @@ let PoolSchema = new Schema({
   map: String,
   maps: {
     lat: Number,
-    long: Number
+    long: Number,
   },
-  events: [Events.schema],
+  events: [Event.schema],
   tags: [String],
-  imageURL: String
-})
+  imageURL: String,
+});
 
-let Pool = mongoose.model('Pool', PoolSchema);
-
-module.exports = Pool;
+module.exports = mongoose.model('Pool', PoolSchema);
