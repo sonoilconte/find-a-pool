@@ -1,27 +1,7 @@
 const GoogleMapsAPI = require('googlemaps');
 const db = require('../models');
 
-function renderMapLatLng(pools) {
-
-  pools.forEach((pool) => {
-    // Geoencode the address of the pool, and save lat and long in the DB
-    // TODO: This appears to be calling maps every time we get a pool in the
-    // index ... if so must change
-    const geocodeParams = {
-      address: pool.address,
-    };
-    const updatedPool = pool;
-    gmAPI.geocode(geocodeParams, (err, encoding) => {
-      updatedPool.maps.lat = encoding.results[0].geometry.location.lat;
-      updatedPool.maps.long = encoding.results[0].geometry.location.lng;
-      console.log('Geoencoding... lat, long ', updatedPool.maps);
-      updatedPool.save();
-    });
-  });
-}
-
-// TODO: we should only geoencode once i.e. when we create the new pool
-function createNewPool(pool) {
+function geocodeAddress(address) {
   // Google maps config
   const publicConfig = {
     key: process.env.MAPS_API_KEY,
@@ -31,38 +11,34 @@ function createNewPool(pool) {
   };
   const gmAPI = new GoogleMapsAPI(publicConfig);
   const geocodeParams = {
-    address: pool.address,
+    address,
   };
-  const updatedPool = pool;
   return new Promise((resolve, reject) => {
     gmAPI.geocode(geocodeParams, (err, res) => {
-      updatedPool.maps.lat = res.results[0].geometry.location.lat;
-      updatedPool.maps.long = res.results[0].geometry.location.lng;
-      console.log('Pool was created and lat, long found from g maps is ', updatedPool.maps);
-      updatedPool.save()
-      .then(pool => {
-        resolve(pool);
-      })
-      .catch(err => {
+      if (err) {
         reject(err);
-      });
+      } else {
+        const coordinates = {};
+        coordinates.lat = res.results[0].geometry.location.lat;
+        coordinates.long = res.results[0].geometry.location.lng;
+        console.log('lat, long found from g maps is ', coordinates);
+        resolve(coordinates);
+      }
     });
-  })
+  });
 }
 
-// Responds with index of all pools
 function index(req, res) {
   db.Pool.find({}, (err, pools) => {
     if (err) {
       console.log('Error finding all pools', err);
     }
-    console.log({ pools });
+    console.log('Finding all pools');
     res.json(pools);
   });
 }
 
 function show(req, res) {
-  // Respond with a pool by ID
   db.Pool.findById(req.params.id, (err, pool) => {
     if (err) {
       console.log('Error finding pool by ID', err);
@@ -72,20 +48,25 @@ function show(req, res) {
 }
 
 function create(req, res) {
-
-  console.log('req.body', req.body);
-  db.Pool.create(req.body)
-  .then((pool) => {
-    console.log('created pool', pool);
-    return createNewPool(pool);
-  })
-  .then(result => {
-    console.log('created pool with result', result);
-    res.json(result);
-  })
-  .catch(err => {
-    console.log('caught error ', err);
-  });
+  console.log('will create pool from req.body', req.body);
+  const poolData = req.body;
+  // TODO: add more complete validation of pool data
+  if (poolData.address) {
+    geocodeAddress(poolData.address)
+    .then((coordinates) => {
+      poolData.maps = coordinates;
+      return db.Pool.create(poolData);
+    })
+    .then((newPool) => {
+      console.log('created new pool', newPool);
+      res.json(newPool);
+    })
+    .catch((err) => {
+      console.log('caught error creating pool', err);
+    });
+  } else {
+    res.status(422).end();
+  }
 }
 
 function destroy(req, res) {
@@ -93,6 +74,7 @@ function destroy(req, res) {
     if (err) {
       console.log('Error finding and deleting pool', err);
     }
+    console.log('Deleting pool ', pool);
     res.json(pool); // TODO: don't respond with entire document?
   });
 }
