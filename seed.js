@@ -1,6 +1,6 @@
-var db = require("./models");
+const db = require('./models');
 
-var poolList =[];
+const poolList = [];
 
 poolList.push({
   name: 'UCSF Bakar Fitness Center',
@@ -17,14 +17,14 @@ poolList.push({
   map: 'https://www.google.com/maps/place/Bakar+Fitness+%26+Recreation+Center+at+UCSF+Mission+Bay/@37.7682497,-122.3954389,17z/data=!3m1!4b1!4m5!3m4!1s0x808f7fcef9a8173f:0x1d557fc43e915386!8m2!3d37.7682497!4d-122.3932502',
   maps: {
     lat: 37.7594696,
-    long: -122.4248613
+    long: -122.4248613,
   },
   tags: ['Adult Swim', 'Lap Swim', 'Swim Team', 'Swim lessons'],
-  imageURL: 'images/ucsf_pool.jpg'
+  imageURL: 'images/ucsf_pool.jpg',
 });
 
 poolList.push({
-  name: ' Pomeroy Rec & Rehab Pool',
+  name: 'Pomeroy Rec & Rehab Pool',
   address: '207 Skyline Blvd San Francisco, CA 94132',
   phoneNumber: '415-665-4241',
   contactEmail: 'info@prrcsf.org',
@@ -38,11 +38,11 @@ poolList.push({
   map: 'https://www.google.com/maps/place/Pomeroy+Recreation+%26+Rehabilitation+Center/@37.7300593,-122.5039161,17z/data=!3m1!4b1!4m5!3m4!1s0x808f7d725580bfe1:0xcc686f35d12e9a9d!8m2!3d37.7300624!4d-122.5014317',
   maps: {
     lat: 37.7594696,
-    long: -122.4248613
+    long: -122.4248613,
   },
   special: 'Swim Practice Tuesdays 5:30PM - 7PM',
   tags: ['Adult Swim'],
-  imageURL: 'images/pomeroy_pool.jpg'
+  imageURL: 'images/pomeroy_pool.jpg',
 });
 
 poolList.push({
@@ -60,11 +60,11 @@ poolList.push({
   map: 'https://google.com/maps/place/Garfield+Pool/@37.7500704,-122.4141837,17z/data=!3m1!4b1!4m5!3m4!1s0x808f7e4f57d753cd:0x961382f699804bc6!8m2!3d37.7500704!4d-122.411995',
   maps: {
     lat: 37.7594696,
-    long: -122.4248613
+    long: -122.4248613,
   },
   special: 'Swim Practice Tuesdays 5:30PM - 7PM',
   tags: ['Adult Swim', 'Lap Swim'],
-  imageURL: 'images/garfield_pool.jpg'
+  imageURL: 'images/garfield_pool.jpg',
 });
 
 poolList.push({
@@ -82,22 +82,22 @@ poolList.push({
   map: 'https://www.google.com/maps/place/Mission+Pool/@37.7594696,-122.424856,17z/data=!3m1!4b1!4m5!3m4!1s0x808f7e22b49293c9:0x4220f652e9211f5f!8m2!3d37.7594696!4d-122.4226673',
   maps: {
     lat: 37.7594696,
-    long: -122.4248613
+    long: -122.4248613,
   },
   special: 'Swim Practice Tuesdays 5:30PM - 7PM',
   tags: ['Adult Swim', 'Swim Team'],
-  imageURL: 'images/mission_pool.jpg'
+  imageURL: 'images/mission_pool.jpg',
 });
 
 
-var eventList = [
+const eventList = [
   {
     dayOfWeek: 'Monday',
     title: 'Swim Team Practice',
     description: '',
     startTime: '7AM',
     endTime: '8AM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Monday',
@@ -105,7 +105,7 @@ var eventList = [
     description: '',
     startTime: '9AM',
     endTime: '11AM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Monday',
@@ -113,7 +113,7 @@ var eventList = [
     description: '',
     startTime: '5PM',
     endTime: '6PM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Tuesday',
@@ -121,7 +121,7 @@ var eventList = [
     description: '',
     startTime: '8AM',
     endTime: '9AM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Tuesday',
@@ -129,7 +129,7 @@ var eventList = [
     description: '',
     startTime: '9AM',
     endTime: '12PM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Tuesday',
@@ -137,7 +137,7 @@ var eventList = [
     description: '',
     startTime: '3PM',
     endTime: '5PM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Wednesday',
@@ -145,7 +145,7 @@ var eventList = [
     description: '',
     startTime: '7AM',
     endTime: '8AM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Wednesday',
@@ -153,7 +153,7 @@ var eventList = [
     description: '',
     startTime: '9AM',
     endTime: '11AM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Wednesday',
@@ -161,7 +161,7 @@ var eventList = [
     description: '',
     startTime: '5PM',
     endTime: '6PM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Thursday',
@@ -169,7 +169,7 @@ var eventList = [
     description: '',
     startTime: '8AM',
     endTime: '9AM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Thursday',
@@ -177,7 +177,7 @@ var eventList = [
     description: '',
     startTime: '9AM',
     endTime: '12PM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Thursday',
@@ -185,7 +185,7 @@ var eventList = [
     description: '',
     startTime: '3PM',
     endTime: '5PM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Friday',
@@ -193,7 +193,7 @@ var eventList = [
     description: '',
     startTime: '7AM',
     endTime: '8AM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Friday',
@@ -201,7 +201,7 @@ var eventList = [
     description: '',
     startTime: '9AM',
     endTime: '11AM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Friday',
@@ -209,7 +209,7 @@ var eventList = [
     description: '',
     startTime: '5PM',
     endTime: '6PM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Saturday',
@@ -217,7 +217,7 @@ var eventList = [
     description: '',
     startTime: '9AM',
     endTime: '5PM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Saturday',
@@ -225,7 +225,7 @@ var eventList = [
     description: '',
     startTime: '9AM',
     endTime: '5PM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Sunday',
@@ -233,7 +233,7 @@ var eventList = [
     description: '',
     startTime: '9AM',
     endTime: '5PM',
-    isRecurring: true
+    isRecurring: true,
   },
   {
     dayOfWeek: 'Sunday',
@@ -241,48 +241,28 @@ var eventList = [
     description: '',
     startTime: '9AM',
     endTime: '5PM',
-    isRecurring: true
-  }
+    isRecurring: true,
+  },
 ];
-//
-// eventList.push({
-//   dayOfWeek: 'Monday',
-//   title: 'Swim Team Practice',
-//   description: 'U-17 Boys & Girls Practice',
-//   startTime: '4PM',
-//   endTime: '5PM',
-//   isRecurring: true
-// });
-//
-// eventList.push({
-//   dayOfWeek: 'Tuesday',
-//   title: 'Swim Meets',
-//   description: 'City Meet Invitational, all qualifiers',
-//   startTime: '3PM',
-//   endTime: '7PM',
-//   isRecurring: true
-// });
-//
-// eventList.push({
-//   dayOfWeek: 'Friday',
-//   title: 'Adult Lessons',
-//   description: '3 Swim lanes set aside for Adult lessons',
-//   startTime: '6PM',
-//   endTime: '8PM',
-//   isRecurring: true
-// });
 
-poolList.forEach(function(pool){
-  pool.events = eventList;
+const poolsWithEvents = [];
+poolList.forEach((pool) => {
+  const poolWithEvents = pool;
+  poolWithEvents.events = eventList;
+  poolsWithEvents.push(poolWithEvents);
 });
 
-// Empty Pools DB & then add seed list pools data via create method.
-db.Pool.remove({}, function(err, pools){
-
-  db.Pool.create(poolList, function(err, pools){
-    if (err) { return console.log('ERROR', err); }
-    console.log("all pools:", pools);
-    console.log("created", pools.length, "pools");
+db.Pool.remove({})
+  .then((commandResult) => {
+    console.log(`Removed ${commandResult.result.n} pools`);
+    return db.Pool.create(poolsWithEvents);
+  })
+  .then((pools) => {
+    console.log('Created ', { pools });
+    console.log(`Created ${pools.length} pools`);
+    process.exit();
+  })
+  .catch((err) => {
+    console.log('Error seeding pools', err);
     process.exit();
   });
-});
