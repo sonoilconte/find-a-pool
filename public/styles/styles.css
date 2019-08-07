@@ -180,12 +180,12 @@ img {
   border-radius: 5px;
 }
 
-#dummy-map{
+.map-insert {
   height: 250px;
   width: 100%;
 }
 
-#dummy-map div {
+.map-insert div {
   margin-top: 10px;
 }
 

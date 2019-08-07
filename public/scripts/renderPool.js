@@ -1,9 +1,6 @@
-console.log("renderPool.js is connected");
-
 function renderPool(pool){
-  console.log(pool.name, pool.monday);
 
-  let poolHTML = `
+  const poolHTML = `
 
   <!--Beginning of Pool Data-->
   <div class="pool col-xs-12" data-pool-id="${pool._id}">
@@ -122,8 +119,7 @@ function renderPool(pool){
         </section>
         <section class="map">
           <div class="overlay" onClick="style.pointerEvents='none'"></div>
-          <div id="dummy-map">
-          </div>
+          <div class="map-insert"></div>
         </section>
 
       </div>
@@ -154,14 +150,9 @@ function renderPool(pool){
       </div>
     </div>
     <!-- Pool Info Column 3 End-->
-
-
     <div class="col-xs-12 pool-tags" data-pool-id="${pool._id}">
     </div>
   </div><!--Pool Info End -->
-
-
   `;
-
   $('#insert-pool').prepend(poolHTML);
 }

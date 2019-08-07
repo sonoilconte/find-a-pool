@@ -1,10 +1,11 @@
-$(document).ready(function() {
-
+$(document).ready(() => {
   indexPools();
   // Add pool event listener and ajax call
-  $('#add-pool form').on('submit', function(e) {
+  const $poolForm = $('#add-pool form');
+  // console.log('$poolForm', $poolForm);
+  $poolForm.on('submit', (e) => {
     e.preventDefault();
-    let data = $(this).serialize();
+    const data = $poolForm.serialize();
     $.ajax({
       method: 'POST',
       url: '/api/pools/',
@@ -12,11 +13,11 @@ $(document).ready(function() {
       success: handleNewPoolSuccess,
       error: handleError
     });
-    $(this).trigger('reset');
+    $poolForm.trigger('reset');
   });
 
   // Admin Log In to toggle admin controls in and out of view
-  $('#admin').on('click', function() {
+  $('#admin').on('click', () => {
     toggleAdmin();
   });
 
@@ -24,10 +25,12 @@ $(document).ready(function() {
 
 
 
-// Any time there's an ajax call, re-attach all the event listeners
+//  Any time there's an ajax call, re-attach all the event listeners
 //  Event listeners are removed at the end of each handleSuccess function
 //  They are re-attached here when ajax calls are complete
-//  This process is to ensure that the listeners are always applied to elements added to the page (add pool, add event), but not applied multiple times resulting in functions being run more times than intended
+//  This process is to ensure that the listeners are always applied to elements
+//  added to the page (add pool, add event), but not applied multiple times
+//  resulting in functions being run more times than intended
 
 $(document).ajaxComplete(listenDeletePool);
 $(document).ajaxComplete(listenAddEvent);
@@ -44,34 +47,35 @@ function indexPools() {
   });
 }
 
-function handleIndexSuccess(poolsData) {
+function handleIndexSuccess(pools) {
   // Render pool data to page
-  poolsData.forEach(function(pool) {
+  pools.forEach((pool) => {
     renderPool(pool);
-    let poolDiv = `[data-pool-id=${pool._id}]`;
-    // For each pool, render the events for that pool
-    pool.events.forEach(function(element){
-      console.log("(1)EVENT load element is: ", element);
-      renderEvent(poolDiv, element);
+    // Grab the $poolDiv using the Mongo _id that has just been injected into the DOM
+    // const $poolDiv = $(`[data-pool-id=${pool._id}]`);
+    const $poolDiv = document.querySelectorAll(`[data-pool-id='${pool._id}']`)[0];
+    pool.events.forEach((evnt) => {
+      // console.log(`On pool ${pool.name} rendering event ${evnt.title}`);
+      renderEvent($poolDiv, evnt);
     });
+    renderTags($poolDiv, pool);
 
-    renderTags(poolDiv, pool);
-
-    console.log('(3)the lat is ', pool.maps.lat);
-
-    let theLocation = {
+    const position = {
       lat: pool.maps.lat,
-      lng: pool.maps.long
+      lng: pool.maps.long,
     };
-    let map = new google.maps.Map(document.getElementById('dummy-map'), {
+    const $mapDiv = $poolDiv.getElementsByClassName('map-insert')[0];
+    const mapConfig = {
       zoom: 12,
-      center: theLocation
+      center: position,
+    };
+    const map = new google.maps.Map($mapDiv, mapConfig);
+    const marker = new google.maps.Marker({
+      position,
+      map,
     });
-    let marker = new google.maps.Marker({
-        position: theLocation,
-        map: map,
-      });
   });
+
   // After indexing all the pools, hide admin and show only the current day
   hideAdmin();
   // For now this simply shows Monday (Later it will show the current day of week on which the site is visited)

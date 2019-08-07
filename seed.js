@@ -1,3 +1,6 @@
+// For the convenience of easy seeding, lat and lng here do not match actual address
+// TODO: including the geocoding step in the seeding 
+
 const db = require('./models');
 
 const poolList = [];
