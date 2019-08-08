@@ -223,6 +223,10 @@ footer nav a {
 
 .pool-tags {
   border: 1px solid #e2e2e2;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding: 10px 0 10px 10px;
+  margin-top: 10px;
+}
+
+.pool-tags button {
+  margin-right: 10px;
 }

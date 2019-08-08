@@ -48,28 +48,26 @@ function indexPools() {
 }
 
 function handleIndexSuccess(pools) {
-  // Render pool data to page
   pools.forEach((pool) => {
     renderPool(pool);
-    // Grab the $poolDiv using the Mongo _id that has just been injected into the DOM
-    // const $poolDiv = $(`[data-pool-id=${pool._id}]`);
-    const $poolDiv = document.querySelectorAll(`[data-pool-id='${pool._id}']`)[0];
+    // Grab the poolDiv using the Mongo _id that has just been injected into the DOM
+    const poolDiv = document.querySelectorAll(`[data-pool-id='${pool._id}']`)[0];
     pool.events.forEach((evnt) => {
       // console.log(`On pool ${pool.name} rendering event ${evnt.title}`);
-      renderEvent($poolDiv, evnt);
+      renderEvent(poolDiv, evnt);
     });
-    renderTags($poolDiv, pool);
+    renderTags(poolDiv, pool);
 
     const position = {
       lat: pool.maps.lat,
       lng: pool.maps.long,
     };
-    const $mapDiv = $poolDiv.getElementsByClassName('map-insert')[0];
+    const mapDiv = poolDiv.getElementsByClassName('map-insert')[0];
     const mapConfig = {
       zoom: 12,
       center: position,
     };
-    const map = new google.maps.Map($mapDiv, mapConfig);
+    const map = new google.maps.Map(mapDiv, mapConfig);
     const marker = new google.maps.Marker({
       position,
       map,

@@ -1,4 +1,4 @@
-function renderEvent($poolDiv, evnt) {
+function renderEvent(poolDiv, evnt) {
   // Append events to the appropriate day in the schedule
   const eventDay = evnt.dayOfWeek.toLowerCase();
   const eventDiv = document.createElement('div');
@@ -15,9 +15,9 @@ function renderEvent($poolDiv, evnt) {
       </div>
     `;
 
-  $poolDiv.getElementsByClassName(eventDay)[0].appendChild(eventDiv);
+  poolDiv.getElementsByClassName(eventDay)[0].appendChild(eventDiv);
 
-  // $poolDiv.find(`.${eventDay}`).children().last().append(
+  // poolDiv.find(`.${eventDay}`).children().last().append(
   //   `
   //     <div class='event row' id='${evnt._id}'>
   //       <div class="col-xs-6">${evnt.title}</div>
