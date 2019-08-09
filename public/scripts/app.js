@@ -129,6 +129,8 @@ function handleNewPoolSuccess(newPool) {
   // TODO: Below I put in a quick fix where I simply reindex all the pools such that you see the new one with the maps ready
   // What I should do is a separate render of the new pool
   // where I injext that new pool's html into the dom without re-rendering everything
+  // but it needs to include the google map
+  // TODO: Use a renderMap function that will be called inside render pool
   indexPools();
   // renderPool(newPool);
   // // get the div for the pool where we'll put events
@@ -141,8 +143,8 @@ function handleNewPoolSuccess(newPool) {
 }
 
 function handlePoolDeleteSuccess(deletedPool) {
-  let poolDiv = `[data-pool-id=${deletedPool._id}]`;
-  $(poolDiv).hide('slow', function(){
+  const poolDiv = `[data-pool-id=${deletedPool._id}]`;
+  $(poolDiv).hide('slow', function() {
     $(poolDiv).remove;
   });
   removeEventListeners();
