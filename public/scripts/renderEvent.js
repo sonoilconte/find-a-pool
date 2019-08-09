@@ -3,7 +3,7 @@ function renderEvent(poolDiv, evnt) {
   const eventDay = evnt.dayOfWeek.toLowerCase();
   const eventDiv = document.createElement('div');
   eventDiv.classList.add('event', 'row');
-  eventDiv.id = evnt._id;
+  eventDiv.dataset.eventId = evnt._id;  // This seems to know from the camel caps that on the HTML it should look like data-event-id
   eventDiv.innerHTML =
     `
       <div class="col-xs-6">${evnt.title}</div>

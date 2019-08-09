@@ -81,9 +81,9 @@ function handleIndexSuccess(pools) {
 }
 
 function listenDeletePool() {
-  $('.pool-delete-btn').on('click', function(e){
+  $('.pool-delete-btn').on('click', function(e) {
     e.preventDefault();
-    let id = $(this).closest('.pool').data('pool-id');
+    const id = $(this).closest('.pool').data('pool-id');
     $.ajax({
       method: 'DELETE',
       url: `/api/pools/${id}`,
@@ -94,34 +94,35 @@ function listenDeletePool() {
 }
 
 function listenAddEvent() {
-  $('.add-event form').on('submit', function(e){
+  $('.add-event form').on('submit', function(e) {
     e.preventDefault();
-    let data = $(this).serialize();
-    let id = $(this).closest('.pool').data('pool-id');
+    const $eventForm = $(this);
+    const data = $eventForm.serialize();
+    const id = $eventForm.closest('.pool').data('pool-id');
     $.ajax({
       method: 'POST',
       url: `/api/pools/${id}/events`,
-      data: data,
+      data,
       success: handleNewEventSuccess,
-      error: handleError
+      error: handleError,
     });
-    $(this).trigger('reset');
+    $eventForm.trigger('reset');
   });
 }
 
 // Event listener for deleting an event
 function listenDeleteEvent() {
-  $('.delete-event').on('click', function(e){
+  $('.delete-event').on('click', function(e) {
     e.preventDefault();
-    let eventId = $(this).parent().parent().attr('id');
-    let poolId = $(this).closest('.pool').data('pool-id');
+    const eventId = $(this).closest('.event').data('event-id');
+    const poolId = $(this).closest('.pool').data('pool-id');
     $.ajax({
       method: 'DELETE',
       url: `/api/pools/${poolId}/events/${eventId}`,
       success: handleEventDeleteSuccess,
       error: handleError
     });
-  })
+  });
 }
 
 function handleNewPoolSuccess(newPool) {
@@ -148,23 +149,25 @@ function handlePoolDeleteSuccess(deletedPool) {
 }
 
 function handleNewEventSuccess(pool) {
-  // create the target for where we're going to place the new event
-  let poolDiv = `[data-pool-id=${pool._id}]`;
-  // set event to add to be the last event listed in the pool response
-  let eventToAdd = pool.events[pool.events.length-1];
+  // Grad the poolDiv for the pool where the event should be placed
+  const poolDiv = document.querySelectorAll(`[data-pool-id='${pool._id}']`)[0];
+  // The event to inject into the DOM is the last event listed in the pool response
+  const eventToAdd = pool.events[pool.events.length - 1];
   renderEvent(poolDiv, eventToAdd);
   removeEventListeners();
 }
 
 function handleEventDeleteSuccess(eventDeleted) {
-    $(`#${eventDeleted._id}`).hide('slow', function() {
-      $(`#${eventDeleted._id}`).remove();
-    });
+  const $eventDeleted = $(`[data-event-id='${eventDeleted._id}']`);
+  console.log({ $eventDeleted });
+  $eventDeleted.hide('slow', function() {
+    $eventDeleted.remove();
+  });
   removeEventListeners();
 }
 
 function handleError(err) {
-  console.log(err);
+  console.log('error', err);
 }
 
 function listenDayClick() {
