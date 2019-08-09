@@ -15,15 +15,11 @@ $(document).ready(() => {
     });
     $poolForm.trigger('reset');
   });
-
   // Admin Log In to toggle admin controls in and out of view
   $('#admin').on('click', () => {
     toggleAdmin();
   });
-
 });
-
-
 
 //  Any time there's an ajax call, re-attach all the event listeners
 //  Event listeners are removed at the end of each handleSuccess function
@@ -50,30 +46,7 @@ function indexPools() {
 function handleIndexSuccess(pools) {
   pools.forEach((pool) => {
     renderPool(pool);
-    // Grab the poolDiv using the Mongo _id that has just been injected into the DOM
-    const poolDiv = document.querySelectorAll(`[data-pool-id='${pool._id}']`)[0];
-    pool.events.forEach((evnt) => {
-      // console.log(`On pool ${pool.name} rendering event ${evnt.title}`);
-      renderEvent(poolDiv, evnt);
-    });
-    renderTags(poolDiv, pool);
-
-    const position = {
-      lat: pool.maps.lat,
-      lng: pool.maps.long,
-    };
-    const mapDiv = poolDiv.getElementsByClassName('map-insert')[0];
-    const mapConfig = {
-      zoom: 12,
-      center: position,
-    };
-    const map = new google.maps.Map(mapDiv, mapConfig);
-    const marker = new google.maps.Marker({
-      position,
-      map,
-    });
   });
-
   // After indexing all the pools, hide admin and show only the current day
   hideAdmin();
   // For now this simply shows Monday (Later it will show the current day of week on which the site is visited)
@@ -131,6 +104,7 @@ function handleNewPoolSuccess(newPool) {
   // where I injext that new pool's html into the dom without re-rendering everything
   // but it needs to include the google map
   // TODO: Use a renderMap function that will be called inside render pool
+  // TODO: Then all you should have to do is call renderPool and renderEvent for each event
   indexPools();
   // renderPool(newPool);
   // // get the div for the pool where we'll put events
