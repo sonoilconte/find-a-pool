@@ -1,24 +1,26 @@
-$(document).ready(() => {
-  indexPools();
-  // Add pool event listener and ajax call
-  const $poolForm = $('#add-pool form');
-  // console.log('$poolForm', $poolForm);
-  $poolForm.on('submit', (e) => {
-    e.preventDefault();
-    const data = $poolForm.serialize();
-    $.ajax({
-      method: 'POST',
-      url: '/api/pools/',
-      data: data,
-      success: handleNewPoolSuccess,
-      error: handleError
-    });
-    $poolForm.trigger('reset');
+let $deletePoolBtn, $deleteEventBtn, $addPoolForm, $addEventForm;
+let adminElements = [];
+
+indexPools();
+// Add pool event listener and ajax call
+const $poolForm = $('#add-pool form');
+// console.log('$poolForm', $poolForm);
+$poolForm.on('submit', (e) => {
+  e.preventDefault();
+  const data = $poolForm.serialize();
+  $.ajax({
+    method: 'POST',
+    url: '/api/pools/',
+    data: data,
+    success: handleNewPoolSuccess,
+    error: handleError
   });
-  // Admin Log In to toggle admin controls in and out of view
-  $('#admin').on('click', () => {
-    toggleAdmin();
-  });
+  $poolForm.trigger('reset');
+});
+
+// Admin Log In to toggle admin controls in and out of view
+$('#admin').on('click', () => {
+  toggleAdmin();
 });
 
 //  Any time there's an ajax call, re-attach all the event listeners
@@ -32,6 +34,15 @@ $(document).ajaxComplete(listenDeletePool);
 $(document).ajaxComplete(listenAddEvent);
 $(document).ajaxComplete(listenDeleteEvent);
 $(document).ajaxComplete(listenDayClick);
+$(document).ajaxComplete(refreshAdminElements); // Can likely remove this along with the others later 
+
+function refreshAdminElements() {
+  $deletePoolBtn = $('.pool-header button');
+  $deleteEventBtn = $('.delete-event');
+  $addPoolForm = $('#add-pool');
+  $addEventForm = $('.add-event');
+  adminElements = [$deletePoolBtn, $deleteEventBtn, $addPoolForm, $addEventForm];
+}
 
 function indexPools() {
   // Get index of all pools in the database
@@ -47,6 +58,7 @@ function handleIndexSuccess(pools) {
   pools.forEach((pool) => {
     renderPool(pool);
   });
+  refreshAdminElements();
   // After indexing all the pools, hide admin and show only the current day
   hideAdmin();
   // For now this simply shows Monday (Later it will show the current day of week on which the site is visited)
@@ -99,21 +111,12 @@ function listenDeleteEvent() {
 }
 
 function handleNewPoolSuccess(newPool) {
-  // TODO: Below I put in a quick fix where I simply reindex all the pools such that you see the new one with the maps ready
-  // What I should do is a separate render of the new pool
-  // where I injext that new pool's html into the dom without re-rendering everything
-  // but it needs to include the google map
-  // TODO: Use a renderMap function that will be called inside render pool
-  // TODO: Then all you should have to do is call renderPool and renderEvent for each event
-  indexPools();
-  // renderPool(newPool);
-  // // get the div for the pool where we'll put events
-  // let poolDiv = `[data-pool-id=${newPool._id}]`;
-  // newPool.events.forEach(function(element){
-  //   renderEvent(poolDiv, element);
-  // });
-  // // remove event listeners such that adding event listeners accross page on ajax complete does not duplicate event listeners
-  // removeEventListeners();
+  renderPool(newPool);
+  refreshAdminElements();
+  hideAdmin();
+  showCurrentDay();
+  // remove event listeners such that adding event listeners accross page on ajax complete does not duplicate event listeners
+  removeEventListeners();
 }
 
 function handlePoolDeleteSuccess(deletedPool) {
@@ -130,6 +133,7 @@ function handleNewEventSuccess(pool) {
   // The event to inject into the DOM is the last event listed in the pool response
   const eventToAdd = pool.events[pool.events.length - 1];
   renderEvent(poolDiv, eventToAdd);
+  refreshAdminElements();
   removeEventListeners();
 }
 
@@ -148,9 +152,8 @@ function handleError(err) {
 
 function listenDayClick() {
   // toggle events for a day of the week clicked
-  $('.day-of-week').on('click', function(e){
+  $('.day-of-week').on('click', function(e) {
     e.preventDefault();
-    console.log('clicked a day of week div');
     $(this).next().toggle(200);
     // toggle the show and hide glyphicons
     $(this).find('.glyphicon').toggle();
@@ -158,17 +161,16 @@ function listenDayClick() {
 }
 
 function toggleAdmin() {
-  $('.pool-header button').toggle();
-  $('.delete-event').toggle();
-  $('#add-pool').toggle();
-  $('.add-event').toggle();
+  adminElements.forEach(adminElement => {
+    adminElement.toggle();
+  });
 }
 
 function hideAdmin() {
-  $('.pool-header button').hide();
-  $('.delete-event').hide();
-  $('#add-pool').hide();
-  $('.add-event').hide();
+  adminElements.forEach(adminElement => {
+    console.log('hide element', adminElement);
+    adminElement.hide();
+  });
 }
 
 function showCurrentDay() {

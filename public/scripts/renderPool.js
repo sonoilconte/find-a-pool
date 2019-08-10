@@ -159,7 +159,7 @@ function renderPool(pool){
   // Grab the poolDiv using the Mongo _id that has just been injected into the DOM
   const poolDiv = document.querySelectorAll(`[data-pool-id='${pool._id}']`)[0];
   pool.events.forEach((evnt) => {
-    console.log(`On pool ${pool.name} rendering event ${evnt.title}`);
+    // console.log(`On pool ${pool.name} rendering event ${evnt.title}`);
     renderEvent(poolDiv, evnt);
   });
   renderMap(poolDiv, pool);
