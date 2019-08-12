@@ -115,10 +115,11 @@ $(document).on('click', '.day-of-week', function(e) {
 });
 
 function showCurrentDay() {
+  const dayOfWeek = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
   $('.event-holder').hide();
-  $('.monday .event-holder').show();
-  $('.monday').find('.glyphicon-plus').toggle();
-  $('.monday').find('.glyphicon-minus').toggle();
+  $(`.${dayOfWeek} .event-holder`).show();
+  $(`.${dayOfWeek}`).find('.glyphicon-plus').toggle();
+  $(`.${dayOfWeek}`).find('.glyphicon-minus').toggle();
 }
 
 function getAdminElements() {
