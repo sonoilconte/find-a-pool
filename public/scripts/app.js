@@ -1,29 +1,7 @@
-//  Any time there's an ajax call, re-attach all the event listeners
-//  Event listeners are removed at the end of each handleSuccess function
-//  They are re-attached here when ajax calls are complete
-//  This process is to ensure that the listeners are always applied to elements
-//  added to the page (add pool, add event), but not applied multiple times
-//  resulting in functions being run more times than intended
-
-// $(document).ajaxComplete(listenDeletePool);
-// $(document).ajaxComplete(listenAddEvent);
-// $(document).ajaxComplete(listenDeleteEvent);
-// $(document).ajaxComplete(listenDayClick);
-// $(document).ajaxComplete(refreshAdminElements); // Can likely remove this along with the others later
-
-function attachListeners() {
-  listenDeletePool();
-  listenAddEvent();
-  listenDeleteEvent();
-  listenDayClick();
-  refreshAdminElements();
-}
-
 function handleIndexSuccess(pools) {
   pools.forEach((pool) => {
     renderPool(pool);
   });
-  attachListeners();
   // After rendering all the pools, hide admin buttons, forms, etc.
   hideAdmin();
   // For now this simply shows Monday (Later it will show the current day of week on which the site is visited)
@@ -44,9 +22,6 @@ indexPools();
 
 function handleNewPoolSuccess(newPool) {
   renderPool(newPool);
-  // remove event listeners such that adding event listeners accross page on ajax complete does not duplicate event listeners
-  removeEventListeners();
-  attachListeners();
   hideAdmin();
   showCurrentDay();
 }
@@ -70,22 +45,18 @@ function handlePoolDeleteSuccess(deletedPool) {
   $(poolDiv).hide('slow', function() {
     $(poolDiv).remove;
   });
-  removeEventListeners();
-  attachListeners();
 }
 
-function listenDeletePool() {
-  $('.pool-delete-btn').on('click', function(e) {
-    e.preventDefault();
-    const id = $(this).closest('.pool').data('pool-id');
-    $.ajax({
-      method: 'DELETE',
-      url: `/api/pools/${id}`,
-      success: handlePoolDeleteSuccess,
-      error: handleError
-    });
+$(document).on('click', '.pool-delete-btn', function(e) {
+  e.preventDefault();
+  const id = $(this).closest('.pool').data('pool-id');
+  $.ajax({
+    method: 'DELETE',
+    url: `/api/pools/${id}`,
+    success: handlePoolDeleteSuccess,
+    error: handleError
   });
-}
+});
 
 function handleNewEventSuccess(pool) {
   // Grad the poolDiv for the pool where the event should be placed
@@ -93,26 +64,22 @@ function handleNewEventSuccess(pool) {
   // The event to inject into the DOM is the last event listed in the pool response
   const eventToAdd = pool.events[pool.events.length - 1];
   renderEvent(poolDiv, eventToAdd);
-  removeEventListeners();
-  attachListeners();
 }
 
-function listenAddEvent() {
-  $('.add-event form').on('submit', function(e) {
-    e.preventDefault();
-    const $eventForm = $(this);
-    const data = $eventForm.serialize();
-    const id = $eventForm.closest('.pool').data('pool-id');
-    $.ajax({
-      method: 'POST',
-      url: `/api/pools/${id}/events`,
-      data,
-      success: handleNewEventSuccess,
-      error: handleError,
-    });
-    $eventForm.trigger('reset');
+$(document).on('submit', '.add-event form', function(e) {
+  e.preventDefault();
+  const $eventForm = $(this);
+  const data = $eventForm.serialize();
+  const id = $eventForm.closest('.pool').data('pool-id');
+  $.ajax({
+    method: 'POST',
+    url: `/api/pools/${id}/events`,
+    data,
+    success: handleNewEventSuccess,
+    error: handleError,
   });
-}
+  $eventForm.trigger('reset');
+});
 
 function handleEventDeleteSuccess(eventDeleted) {
   const $eventDeleted = $(`[data-event-id='${eventDeleted._id}']`);
@@ -120,38 +87,32 @@ function handleEventDeleteSuccess(eventDeleted) {
   $eventDeleted.hide('slow', function() {
     $eventDeleted.remove();
   });
-  removeEventListeners();
-  attachListeners();
 }
 
 // Event listener for deleting an event
-function listenDeleteEvent() {
-  $('.delete-event').on('click', function(e) {
-    e.preventDefault();
-    const eventId = $(this).closest('.event').data('event-id');
-    const poolId = $(this).closest('.pool').data('pool-id');
-    $.ajax({
-      method: 'DELETE',
-      url: `/api/pools/${poolId}/events/${eventId}`,
-      success: handleEventDeleteSuccess,
-      error: handleError
-    });
+$(document).on('click', '.delete-event', function(e) {
+  e.preventDefault();
+  const eventId = $(this).closest('.event').data('event-id');
+  const poolId = $(this).closest('.pool').data('pool-id');
+  $.ajax({
+    method: 'DELETE',
+    url: `/api/pools/${poolId}/events/${eventId}`,
+    success: handleEventDeleteSuccess,
+    error: handleError
   });
-}
+});
 
 function handleError(err) {
   console.log('error', err);
 }
 
-function listenDayClick() {
-  // Toggle events for a day of the week clicked
-  $('.day-of-week').on('click', function(e) {
-    e.preventDefault();
-    $(this).next().toggle(200);
-    // Toggle the show and hide glyphicons
-    $(this).find('.glyphicon').toggle();
-  });
-}
+// Toggle events for a day of the week clicked
+$(document).on('click', '.day-of-week', function(e) {
+  e.preventDefault();
+  $(this).next().toggle(200);
+  // Toggle the show and hide glyphicons
+  $(this).find('.glyphicon').toggle();
+});
 
 function showCurrentDay() {
   $('.event-holder').hide();
@@ -160,36 +121,18 @@ function showCurrentDay() {
   $('.monday').find('.glyphicon-minus').toggle();
 }
 
-// remove event listeners such that adding event listeners accross whole page on ajax complete does not duplicate event listeners
-function removeEventListeners() {
-  $('.pool-delete-btn').off();
-  $('.add-event form').off();
-  $('.delete-event').off();
-  $('.day-of-week').off();
-}
-
-let $deletePoolBtn, $deleteEventBtn, $addPoolForm, $addEventForm;
-let adminElements = [];
-
-// refreshAdminElements is called to make sure adminElements contains all
-// the 'admin' DOM nodes, e.g. the delete pool button which should only display
-// if the user is 'logged in'
-function refreshAdminElements() {
-  $deletePoolBtn = $('.pool-header button');
-  $deleteEventBtn = $('.delete-event');
-  $addPoolForm = $('#add-pool');
-  $addEventForm = $('.add-event');
-  adminElements = [$deletePoolBtn, $deleteEventBtn, $addPoolForm, $addEventForm];
+function getAdminElements() {
+  return [$('.pool-header button'), $('.delete-event'), $('#add-pool'), $('.add-event')];
 }
 
 function toggleAdmin() {
-  adminElements.forEach(adminElement => {
+  getAdminElements().forEach(adminElement => {
     adminElement.toggle();
   });
 }
 
 function hideAdmin() {
-  adminElements.forEach(adminElement => {
+  getAdminElements().forEach(adminElement => {
     adminElement.hide();
   });
 }
