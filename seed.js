@@ -1,5 +1,5 @@
 // For the convenience of easy seeding, lat and lng here do not match actual address
-// TODO: including the geocoding step in the seeding 
+// TODO: including the geocoding step in the seeding
 
 const db = require('./models');
 
@@ -257,7 +257,9 @@ poolList.forEach((pool) => {
 
 db.Pool.remove({})
   .then((commandResult) => {
-    console.log(`Removed ${commandResult.result.n} pools`);
+    if (commandResult && commandResult.result) {
+      console.log(`Removed ${commandResult.result.n} pools`);
+    }
     return db.Pool.create(poolsWithEvents);
   })
   .then((pools) => {
