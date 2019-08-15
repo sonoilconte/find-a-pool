@@ -1,7 +1,9 @@
-function renderPool(pool){
+import renderEvent from './renderEvent.js';
+import renderMap from './renderMap.js';
+import renderTags from './renderTags.js';
 
+export default function renderPool(pool) {
   const poolHTML = `
-
   <!--Beginning of Pool Data-->
   <div class="pool col-xs-12" data-pool-id="${pool._id}">
     <div class="row">
@@ -152,8 +154,7 @@ function renderPool(pool){
     <!-- Pool Info Column 3 End-->
     <div class="col-xs-12 pool-tags" data-pool-id="${pool._id}">
     </div>
-  </div><!--Pool Info End -->
-  `;
+  </div><!--Pool Info End -->`;
   $('#insert-pool').prepend(poolHTML);
 
   // Grab the poolDiv using the Mongo _id that has just been injected into the DOM

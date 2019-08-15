@@ -1,4 +1,4 @@
-function serialize(form) {
+export default function serialize(form) {
 	if (!form || form.nodeName !== "FORM") {
 		return;
 	}

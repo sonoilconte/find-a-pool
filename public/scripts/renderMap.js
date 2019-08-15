@@ -1,4 +1,4 @@
-function renderMap(poolDiv, pool) {
+export default function renderMap(poolDiv, pool) {
   const position = {
     lat: pool.maps.lat,
     lng: pool.maps.long,

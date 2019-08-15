@@ -1,4 +1,4 @@
-function renderEvent(poolDiv, evnt) {
+export default function renderEvent(poolDiv, evnt) {
   // Append events to the appropriate day in the schedule
   const eventDay = evnt.dayOfWeek.toLowerCase();
   const eventDiv = document.createElement('div');

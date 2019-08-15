@@ -1,4 +1,4 @@
-function renderTags(poolDiv, pool) {
+export default function renderTags(poolDiv, pool) {
   const poolTagsDiv = poolDiv.getElementsByClassName('pool-tags')[0];
   pool.tags.forEach((tag) => {
     const poolTag = document.createElement('button');

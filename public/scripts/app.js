@@ -1,3 +1,7 @@
+import renderPool from './renderPool.js';
+import renderEvent from './renderEvent.js';
+import serialize from './serialize-0.2.js';
+
 function handleError(err) {
   console.log('error', err);
 }
