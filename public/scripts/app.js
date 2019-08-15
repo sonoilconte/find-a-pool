@@ -1,10 +1,42 @@
+function handleError(err) {
+  console.log('error', err);
+}
+
+function showCurrentDay() {
+  const dayOfWeek = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+  $('.event-holder').hide();
+  $(`.${dayOfWeek} .event-holder`).show();
+  $(`.${dayOfWeek}`).find('.glyphicon-plus').toggle();
+  $(`.${dayOfWeek}`).find('.glyphicon-minus').toggle();
+}
+
+function getAdminElements() {
+  return [$('.pool-header button'), $('.delete-event'), $('#add-pool'), $('.add-event')];
+}
+
+function toggleAdmin() {
+  getAdminElements().forEach((adminElement) => {
+    adminElement.toggle();
+  });
+}
+
+function hideAdmin() {
+  getAdminElements().forEach((adminElement) => {
+    adminElement.hide();
+  });
+}
+
+// Admin Log In to toggle admin controls in and out of view
+$('#admin').on('click', () => {
+  toggleAdmin();
+});
+
 function handleIndexSuccess(pools) {
   pools.forEach((pool) => {
     renderPool(pool);
   });
   // After rendering all the pools, hide admin buttons, forms, etc.
   hideAdmin();
-  // For now this simply shows Monday (Later it will show the current day of week on which the site is visited)
   showCurrentDay();
 }
 
@@ -14,7 +46,7 @@ function indexPools() {
     method: 'GET',
     url: 'api/pools/',
     success: handleIndexSuccess,
-    error: handleError
+    error: handleError,
   });
 }
 
@@ -33,28 +65,28 @@ $poolForm.on('submit', (e) => {
   $.ajax({
     method: 'POST',
     url: '/api/pools/',
-    data: data,
+    data,
     success: handleNewPoolSuccess,
-    error: handleError
+    error: handleError,
   });
   $poolForm.trigger('reset');
 });
 
 function handlePoolDeleteSuccess(deletedPool) {
-  const poolDiv = `[data-pool-id=${deletedPool._id}]`;
-  $(poolDiv).hide('slow', function() {
-    $(poolDiv).remove;
+  const $poolDiv = $(`[data-pool-id=${deletedPool._id}]`);
+  $poolDiv.hide('slow', () => {
+    $poolDiv.remove();
   });
 }
 
-$(document).on('click', '.pool-delete-btn', function(e) {
+$(document).on('click', '.pool-delete-btn', (e) => {
   e.preventDefault();
-  const id = $(this).closest('.pool').data('pool-id');
+  const id = e.target.closest('.pool').dataset.poolId;
   $.ajax({
     method: 'DELETE',
     url: `/api/pools/${id}`,
     success: handlePoolDeleteSuccess,
-    error: handleError
+    error: handleError,
   });
 });
 
@@ -66,11 +98,11 @@ function handleNewEventSuccess(pool) {
   renderEvent(poolDiv, eventToAdd);
 }
 
-$(document).on('submit', '.add-event form', function(e) {
+$(document).on('submit', '.add-event form', (e) => {
   e.preventDefault();
-  const $eventForm = $(this);
-  const data = $eventForm.serialize();
-  const id = $eventForm.closest('.pool').data('pool-id');
+  const form = e.target;
+  const data = serialize(form);
+  const id = form.closest('.pool').dataset.poolId;
   $.ajax({
     method: 'POST',
     url: `/api/pools/${id}/events`,
@@ -78,67 +110,35 @@ $(document).on('submit', '.add-event form', function(e) {
     success: handleNewEventSuccess,
     error: handleError,
   });
-  $eventForm.trigger('reset');
+  form.reset();
 });
 
 function handleEventDeleteSuccess(eventDeleted) {
   const $eventDeleted = $(`[data-event-id='${eventDeleted._id}']`);
-  console.log({ $eventDeleted });
-  $eventDeleted.hide('slow', function() {
+  $eventDeleted.hide('slow', () => {
     $eventDeleted.remove();
   });
 }
 
 // Event listener for deleting an event
-$(document).on('click', '.delete-event', function(e) {
+$(document).on('click', '.delete-event', (e) => {
   e.preventDefault();
-  const eventId = $(this).closest('.event').data('event-id');
-  const poolId = $(this).closest('.pool').data('pool-id');
+  const { eventId } = e.target.closest('.event').dataset;
+  const { poolId } = e.target.closest('.pool').dataset;
   $.ajax({
     method: 'DELETE',
     url: `/api/pools/${poolId}/events/${eventId}`,
     success: handleEventDeleteSuccess,
-    error: handleError
+    error: handleError,
   });
 });
-
-function handleError(err) {
-  console.log('error', err);
-}
 
 // Toggle events for a day of the week clicked
-$(document).on('click', '.day-of-week', function(e) {
+$(document).on('click', '.day-of-week', function (e) {
   e.preventDefault();
-  $(this).next().toggle(200);
-  // Toggle the show and hide glyphicons
-  $(this).find('.glyphicon').toggle();
-});
-
-function showCurrentDay() {
-  const dayOfWeek = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-  $('.event-holder').hide();
-  $(`.${dayOfWeek} .event-holder`).show();
-  $(`.${dayOfWeek}`).find('.glyphicon-plus').toggle();
-  $(`.${dayOfWeek}`).find('.glyphicon-minus').toggle();
-}
-
-function getAdminElements() {
-  return [$('.pool-header button'), $('.delete-event'), $('#add-pool'), $('.add-event')];
-}
-
-function toggleAdmin() {
-  getAdminElements().forEach(adminElement => {
-    adminElement.toggle();
-  });
-}
-
-function hideAdmin() {
-  getAdminElements().forEach(adminElement => {
-    adminElement.hide();
-  });
-}
-
-// Admin Log In to toggle admin controls in and out of view
-$('#admin').on('click', () => {
-  toggleAdmin();
+  const $dayDiv = $(this);
+  // Toggle the events for the day, which are held in the next sibling
+  $dayDiv.next().toggle(200);
+  // Toggle the +/- glyphicons representing whether the events are shown or hidden
+  $dayDiv.find('.glyphicon').toggle();
 });

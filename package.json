@@ -1,7 +1,7 @@
 {
-  "name": "wdi-39-project-1",
+  "name": "Find-a-pool",
   "version": "1.0.0",
-  "description": "pool app Sepp H Bryan M",
+  "description": "An app for pool location and scheduling",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
